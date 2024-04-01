@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipes List</title>
+    <style>
+        .recipe-card {
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            width: 240px; /* Adjust based on your needs */
+            border-radius: 5px; /* Rounded corners */
+            display: inline-block;
+            margin: 16px;
+            vertical-align: top;
+            overflow: hidden; /* Ensures content does not overflow the rounded corners */
+        }
+    
+        .recipe-card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+    
+        .recipe-card img {
+            width: 100%;
+            height: 160px; /* Adjust based on your needs */
+            object-fit: cover; /* Ensures the image covers the area nicely */
+        }
+    
+        .recipe-card-container {
+            padding: 16px;
+            text-align: center;
+        }
+    
+        .recipe-card-container h4 {
+            margin: 6px 0;
+            font-size: 18px; /* Adjust based on your needs */
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .comment-container {
+            margin-top: 24px;
+            width: 884px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>    
+</head>
+<body>
+    <div class="center">
+        <h1>Recipes List</h1>
+        {% if user.is_authenticated %}
+            <a href="{% url 'recipe_new' %}">Add New Recipe</a>
+        {% endif %}
+    </div>
+    <br> <!-- Add this line -->
+    {% for recipe in recipes %}
+        <div class="recipe-card">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" style="width:100%">
+            {% endif %}
+            <div class="recipe-card-container">
+                <h4><b>{{ recipe.name }}</b></h4>
+                <p>Created by: {{ recipe.owner.username }}</p>
+                <!-- Optional: Include categories or other recipe details here -->
+                {% if user.is_authenticated %}
+                    <div class="recipe-actions">
+                        <a href="{% url 'recipe_edit' recipe.id %}">Edit</a> | 
+                        <a href="{% url 'recipe_delete' recipe.id %}" onclick="return confirm('Are you sure?');">Delete</a>
+                    </div>
+                {% endif %}
+                <p><a href="{% url 'recipe_detail' recipe.id %}">View Recipe</a></p>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Display comments -->
+    <div class="comment-container">
+        <h1 style="text-align: center">Page Comments</h1>
+        {% for comment in comments %}
+             <div style="text-align: left">
+                <span style="font-size: 18px"><strong>{{ comment.author.username }}</strong></span>
+                <span> {{ comment.created_date }}:</span>
+                <p class="comment">{{ comment.text }}</p>
+            </div>
+        {% endfor %}
+       <div style="margin: auto"> <a href="{% url 'more_comments' %}" class="btn recipe-btn" >More Comments</a></div>
+
+         {% if user.is_authenticated %}
+            <div class="comment-form">
+                <h2 style="margin: 24px 0">Leave a comment</h2>
+                <form method="post" action="" style="display: flex; flex-direction: column; justify-content: center">
+                    {% csrf_token %}
+                    <textarea name="text" rows="4" cols="50" placeholder="Enter your comment here" style="width: 100%; border-radius: 12px; padding: 8px"></textarea>
+                    <button type="submit" class="btn recipe-btn" style="margin: 24px auto">Post comment</button>
+                </form>
+            </div>
+        {% endif %}
+
+
+    </div>
+
+    <!-- Comment form for authenticated users -->
+
+
+</body>
+</html>
+{% endblock %}

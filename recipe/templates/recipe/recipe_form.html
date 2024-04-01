@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add/Edit Recipe</title>
+</head>
+<body>
+    <h1>{% if object %}Edit{% else %}Add{% endif %} Recipe</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="file" name="image">
+        <!-- <label for="id_category_input">Categories (separate with commas):</label> -->
+        <label for="id_category_input">Category:</label>
+        <input type="text" name="category_input" id="id_category_input" value="{{ form.category_input.value|default_if_none:'' }}">
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
+{% endblock %}

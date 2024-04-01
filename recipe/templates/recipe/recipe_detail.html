@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ recipe.name }}</title>
+    <style>
+        .center {
+            text-align: center;
+            width: 844px;
+            margin: 0 auto;
+        }
+        .recipe-title {
+            border: 1px solid #a5a5a5;
+            border-radius: 24px;
+            padding: 8px 24px;
+            width: max-content;
+            margin: 12px auto;
+        }
+        .card {
+            display: flex;
+            margin: 24px auto;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 2px 30px #5f6f7c;
+        }
+        .card .title{
+            font-size: 24px;
+            font-weight: bold;
+            margin: 12px;
+        }
+        .card-text {
+            padding: 0 24px;
+        }
+
+        .comment {
+            margin: 16px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="center">
+        <h1>{{ recipe.name }}</h1>
+        <div class="recipe-title">
+            <span style="margin-right: 24px "><img src="{% static '_User.png' %}" style="width: 28px"/> {{ recipe.owner.username }}</span>
+            <!-- Other details -->
+            <span style="margin-left: 24px ">
+                <img src="{% static 'category.png' %}" style="width: 28px; margin-right: 8px"/>
+                {% for category in recipe.categories.all %}
+                    {{ category.name }}
+                {% empty %}
+                    Uncategorised
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="card">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" style="max-width: 100%; height: auto;">
+            {% endif %}
+        </div>
+
+        <div class="card card-text">
+            <p class="title"><strong>Ingredients:</strong> </p>
+            <p>{{ recipe.ingredients }}</p>
+        </div>
+
+        <div class="card card-text">
+            <p class="title"><strong>Instructions:</strong> </p>
+            <p> {{ recipe.instructions }}</p>
+        </div>
+
+
+        {% if  user.is_authenticated %}
+            <a class="btn recipe-btn " href="{% url 'recipe_edit' recipe.id %}">Edit Recipe</a> |
+        {% endif %}
+
+        <a  class="btn recipe-btn" href="{% url 'recipe_list' %}">Back to Recipe List</a>
+
+        <div style="width: 100%; background: #c6c6c6; height: 1px; margin: 16px 0"></div>
+        <!-- Display comments -->
+        <div class="comments" >
+            <h2 style="margin-bottom: 24px">Comments</h2>
+            {% for comment in comments %}
+                <div style="text-align: left">
+                    <span style="font-size: 18px"><strong>{{ comment.author.username }}</strong></span>
+                    <span> {{ comment.created_date }}:</span>
+                    <p class="comment">{{ comment.text }}</p>
+                </div>
+
+            {% empty %}
+                <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Comment form -->
+        <div class="comment-form">
+            <h2 style="margin: 24px 0">Leave a comment</h2>
+            <form method="post" action="">
+                {% csrf_token %}
+                <textarea name="text" rows="4" cols="50" placeholder="Enter your comment here" style="width: 100%; border-radius: 12px; padding: 8px"></textarea>
+                <button type="submit" class="btn recipe-btn">Post comment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
